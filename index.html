@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tools — Andre Glegg</title>
+    <meta
+      name="description"
+      content="Remote MCP tools for game asset work. Generate low-poly trees and cut sprite backgrounds straight from Claude, Codex, or any MCP client."
+    />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🌳</text></svg>" />
+
+    <meta property="og:title" content="Tools — Andre Glegg" />
+    <meta property="og:description" content="Remote MCP tools for game asset work. Connect one in a minute." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tools.andreglegg.no" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Live link to the actual MCP host. Its state is the only thing on this
+         page that depends on the server being up. -->
+    <header class="statusbar">
+      <a class="statusbar__brand" href="https://andreglegg.no">andre glegg</a>
+      <div class="statusbar__host">
+        <span class="dot" data-status-dot aria-hidden="true"></span>
+        <span data-status-text>checking mcp.andreglegg.no</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- The hero is the working tool, not a picture of one. -->
+      <section class="stage" aria-labelledby="stage-title">
+        <div class="stage__viewport">
+          <canvas data-canvas aria-label="Live preview of the generated tree"></canvas>
+          <dl class="hud" data-hud>
+            <div><dt>seed</dt><dd data-hud-seed>—</dd></div>
+            <div><dt>tris</dt><dd data-hud-tris>—</dd></div>
+            <div><dt>meshes</dt><dd data-hud-meshes>—</dd></div>
+            <div><dt>build</dt><dd data-hud-ms>—</dd></div>
+          </dl>
+        </div>
+
+        <div class="stage__panel">
+          <h1 id="stage-title" class="display">
+            Tools that<br />make things
+          </h1>
+          <p class="lede">
+            Two generators for game asset work, hosted as remote MCP servers.
+            Nothing to install — point your client at a URL. This tree is
+            generating in your browser right now; change it.
+          </p>
+
+          <form class="rig" data-rig>
+            <div class="rig__row">
+              <label for="species">Species</label>
+              <select id="species" name="species">
+                <option value="round">Round</option>
+                <option value="oak" selected>Oak</option>
+                <option value="acacia">Acacia</option>
+                <option value="willow">Willow</option>
+                <option value="pine">Pine</option>
+              </select>
+            </div>
+
+            <div class="rig__row">
+              <label for="detail">Detail</label>
+              <select id="detail" name="detail">
+                <option value="0">0 — low-poly</option>
+                <option value="1" selected>1 — game-ready</option>
+                <option value="2">2 — hero</option>
+              </select>
+            </div>
+
+            <div class="rig__row">
+              <label for="height">Height <output data-out="height"></output></label>
+              <input id="height" name="height" type="range" min="3" max="10" step="0.1" value="6.7" />
+            </div>
+
+            <div class="rig__row">
+              <label for="canopySize">Canopy <output data-out="canopySize"></output></label>
+              <input id="canopySize" name="canopySize" type="range" min="0.9" max="3.6" step="0.05" value="2.8" />
+            </div>
+
+            <div class="rig__row">
+              <label for="leafDensity">Foliage <output data-out="leafDensity"></output></label>
+              <input id="leafDensity" name="leafDensity" type="range" min="8" max="64" step="1" value="46" />
+            </div>
+
+            <div class="rig__row">
+              <label for="lean">Lean <output data-out="lean"></output></label>
+              <input id="lean" name="lean" type="range" min="0" max="0.55" step="0.01" value="0.1" />
+            </div>
+
+            <div class="rig__actions">
+              <button type="button" data-reroll>Reroll seed</button>
+              <button type="button" class="primary" data-download>Download GLB</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Connect: the page's actual job. -->
+      <section class="connect" aria-labelledby="connect-title">
+        <h2 id="connect-title" class="section-title">Connect it</h2>
+        <p class="section-lede">
+          One command. The server is public and needs no key.
+        </p>
+        <div class="snippet">
+          <code data-snippet>claude mcp add --transport http treegen https://mcp.andreglegg.no/treegen</code>
+          <button type="button" data-copy aria-label="Copy connect command">Copy</button>
+        </div>
+        <p class="footnote">
+          Works with any MCP client that speaks Streamable HTTP. Generated files
+          come back as download links valid for 30 minutes, so a 600&nbsp;KB mesh
+          never lands in your model's context.
+        </p>
+        <button type="button" class="ghost" data-live-call>Run a live call against the server</button>
+        <pre class="wire" data-live-output hidden></pre>
+      </section>
+
+      <!-- Catalog -->
+      <section class="catalog" aria-labelledby="catalog-title">
+        <h2 id="catalog-title" class="section-title">The tools</h2>
+        <div class="cards" data-cards></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        Built by <a href="https://andreglegg.no">Andre Glegg</a> · Oslo ·
+        <a href="https://github.com/andreglegg/treegen">treegen</a> ·
+        <a href="https://github.com/andreglegg/mcp.andreglegg.no">the host</a>
+      </p>
+      <p class="foot__note">
+        Self-hosted on hardware in my flat. If the status light is out, the
+        playground above still works — it runs entirely in your browser.
+      </p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

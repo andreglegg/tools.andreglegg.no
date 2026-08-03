@@ -1,0 +1,19 @@
+{
+  "name": "tools-andreglegg-no",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test --test-timeout=20000 test/*.test.js"
+  },
+  "dependencies": {
+    "three": "^0.168.0",
+    "treegen": "github:andreglegg/treegen"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5"
+  }
+}
