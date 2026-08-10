@@ -45,6 +45,7 @@ function readRig() {
   return {
     species: data.get('species'),
     detail: Number(data.get('detail')),
+    age: Number(data.get('age')),
     height: Number(data.get('height')),
     canopySize: Number(data.get('canopySize')),
     leafDensity: Number(data.get('leafDensity')),

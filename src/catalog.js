@@ -6,8 +6,8 @@ export const TOOLS = [
     access: 'public',
     route: 'treegen',
     blurb:
-      'Stylized low-poly trees. Deterministic — the same seed always gives the same tree — with triangle budgets from 1k to 7k. Exports GLB, OBJ, or the raw preset.',
-    tools: ['generate_tree', 'random_tree', 'list_presets'],
+      'Stylized low-poly trees, nine species from 2m saplings to 50m buttressed giants. Deterministic — the same seed always gives the same tree — and the age param plays a whole life, sapling to gnarled veteran. Game exports merge each tree to 2 draw calls with LOD0-2.',
+    tools: ['generate_tree', 'random_tree', 'list_presets', 'export_game_tree', 'export_forest'],
     repo: 'https://github.com/andreglegg/treegen',
   },
   {
