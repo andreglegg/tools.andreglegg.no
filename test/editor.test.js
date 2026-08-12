@@ -4,6 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
+import { statSync } from 'node:fs';
 
 const URL = process.env.PREVIEW_URL_EDITOR ?? 'http://localhost:4173/treegen/';
 
@@ -146,5 +147,28 @@ test('dragging the viewport orbits the camera and stops auto-rotate', async () =
   const after = await page.evaluate(() => window.__treegenEditor.cameraPosition());
 
   assert.notDeepEqual(before, after, 'camera moved after drag');
+  await browser.close();
+});
+
+async function expectDownload(page, selector, namePattern) {
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 30_000 }),
+    page.click(selector),
+  ]);
+  assert.match(download.suggestedFilename(), namePattern);
+  const file = await download.path();
+  assert.ok(statSync(file).size > 500, `${selector} produced a non-trivial file`);
+}
+
+test('all four exports download real files', async () => {
+  const { browser, page } = await loadEditor({ query: '?seed=77' });
+
+  // Small forest keeps the test fast.
+  await page.fill('[data-forest-count]', '3');
+
+  await expectDownload(page, '[data-export="glb"]', /^treegen_oak_77\.glb$/);
+  await expectDownload(page, '[data-export="obj"]', /^treegen_oak_77\.obj$/);
+  await expectDownload(page, '[data-export="game"]', /^treegen_oak_77_game\.glb$/);
+  await expectDownload(page, '[data-export="forest"]', /^treegen_forest_77\.glb$/);
   await browser.close();
 });

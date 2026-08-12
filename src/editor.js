@@ -1,6 +1,7 @@
 import './styles.css';
 import './editor.css';
 import { presets, defaultParams } from 'treegen/generator';
+import { exportGlb, exportObj, exportGameGlb, exportForestGlb } from 'treegen/export';
 import { createPlayground } from './playground.js';
 import { checkHealth } from './mcp.js';
 import { GROUPS, PARAMS, coerce } from './treegen-params.js';
@@ -233,6 +234,57 @@ for (const name of Object.keys(presets)) {
   chip.textContent = name;
   chip.addEventListener('click', () => applyPreset(name));
   presetMount.append(chip);
+}
+
+/* --- exports ---------------------------------------------------------------- */
+function download(data, filename, type) {
+  const blob = data instanceof Blob ? data : new Blob([data], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const EXPORTERS = {
+  glb: async () =>
+    download(await exportGlb(playground.tree), `treegen_${state.species}_${state.seed}.glb`, 'model/gltf-binary'),
+  obj: async () =>
+    download(exportObj(playground.tree), `treegen_${state.species}_${state.seed}.obj`, 'text/plain'),
+  game: async () =>
+    download(await exportGameGlb({ ...state }), `treegen_${state.species}_${state.seed}_game.glb`, 'model/gltf-binary'),
+  forest: async () =>
+    download(
+      await exportForestGlb({
+        params: { ...state },
+        count: Number($('[data-forest-count]').value),
+        seedBase: state.seed,
+        agedSpread: Number($('[data-forest-spread]').value),
+      }),
+      `treegen_forest_${state.seed}.glb`,
+      'model/gltf-binary'
+    ),
+};
+
+for (const button of document.querySelectorAll('[data-export]')) {
+  const label = button.textContent;
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    button.textContent = 'Exporting…';
+    try {
+      await EXPORTERS[button.dataset.export]();
+      button.textContent = 'Downloaded';
+    } catch (err) {
+      console.error(err);
+      button.textContent = 'Export failed';
+    } finally {
+      setTimeout(() => {
+        button.disabled = false;
+        button.textContent = label;
+      }, 1600);
+    }
+  });
 }
 
 /* --- test/debug hook ------------------------------------------------------- */

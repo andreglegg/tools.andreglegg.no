@@ -45,7 +45,18 @@
       <aside class="editor__panel" data-panel>
         <button type="button" class="editor__sheet-toggle" data-sheet-toggle aria-expanded="true">Parameters</button>
         <form class="editor__form" data-form></form>
-        <div class="editor__exports" data-exports></div>
+        <div class="editor__exports" data-exports>
+          <div class="exports__row">
+            <button type="button" data-export="glb">GLB</button>
+            <button type="button" data-export="obj">OBJ</button>
+            <button type="button" data-export="game" title="Merged 2-draw-call game mesh with LOD0–2">Game GLB</button>
+            <button type="button" data-export="forest" title="A batch of seed variations in one file">Forest GLB</button>
+          </div>
+          <div class="exports__forest">
+            <label>count <input data-forest-count type="number" min="2" max="64" value="9" /></label>
+            <label>aged spread <input data-forest-spread type="range" min="0" max="1" step="0.05" value="0.35" /></label>
+          </div>
+        </div>
       </aside>
     </main>
 
