@@ -38,3 +38,5 @@
 .swatches { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .swatch { width: 2rem; height: 1.25rem; border-radius: 4px; border: 1px solid transparent; padding: 0; }
 .swatch[aria-pressed='true'] { border-color: currentColor; outline: 2px solid currentColor; }
+
+.exports__mcp { display: flex; gap: 0.4rem; margin-top: 0.5rem; }

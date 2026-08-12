@@ -172,3 +172,18 @@ test('all four exports download real files', async () => {
   await expectDownload(page, '[data-export="forest"]', /^treegen_forest_77\.glb$/);
   await browser.close();
 });
+
+test('MCP snippet contains only non-default params plus seed', async () => {
+  const { browser, page } = await loadEditor({ query: '?species=palm&lean=0.4&seed=55' });
+
+  const call = await page.evaluate(() => window.__treegenEditor.buildMcpCall('generate_tree'));
+  assert.equal(call.tool, 'generate_tree');
+  assert.equal(call.arguments.seed, 55);
+  assert.equal(call.arguments.species, 'palm');
+  assert.equal(call.arguments.lean, 0.4);
+  // Initial state is presets.oak, so oak params that differ from defaultParams
+  // (meadow-based) legitimately appear too. detail is 1 in both — must be absent.
+  assert.ok(!('detail' in call.arguments), 'default detail omitted');
+  assert.ok(!('brokenTop' in call.arguments), 'unset toggle omitted');
+  await browser.close();
+});

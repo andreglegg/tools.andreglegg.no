@@ -287,10 +287,30 @@ for (const button of document.querySelectorAll('[data-export]')) {
   });
 }
 
+/* --- MCP snippet ------------------------------------------------------------ */
+function buildMcpCall(tool) {
+  const args = { seed: state.seed };
+  for (const def of PARAMS) {
+    const value = state[def.name];
+    const fallback = def.control === 'toggle' ? false : defaultParams[def.name];
+    if (value !== undefined && value !== fallback) args[def.name] = value;
+  }
+  return { tool, arguments: args };
+}
+
+$('[data-mcp-copy]').addEventListener('click', async (event) => {
+  const button = event.currentTarget;
+  const call = buildMcpCall($('[data-mcp-tool]').value);
+  await navigator.clipboard.writeText(JSON.stringify(call, null, 2));
+  button.textContent = 'Copied';
+  setTimeout(() => { button.textContent = 'Copy MCP call'; }, 1600);
+});
+
 /* --- test/debug hook ------------------------------------------------------- */
 window.__treegenEditor = {
   getState: () => ({ ...state }),
   apply,
+  buildMcpCall,
   PARAMS: PARAMS.map((p) => p.name),
   cameraPosition: () => {
     const { x, y, z } = playground.camera.position;

@@ -56,6 +56,13 @@
             <label>count <input data-forest-count type="number" min="2" max="64" value="9" /></label>
             <label>aged spread <input data-forest-spread type="range" min="0" max="1" step="0.05" value="0.35" /></label>
           </div>
+          <div class="exports__mcp">
+            <select data-mcp-tool aria-label="MCP tool">
+              <option value="generate_tree" selected>generate_tree</option>
+              <option value="export_game_tree">export_game_tree</option>
+            </select>
+            <button type="button" data-mcp-copy>Copy MCP call</button>
+          </div>
         </div>
       </aside>
     </main>
