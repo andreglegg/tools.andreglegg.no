@@ -187,3 +187,18 @@ test('MCP snippet contains only non-default params plus seed', async () => {
   assert.ok(!('brokenTop' in call.arguments), 'unset toggle omitted');
   await browser.close();
 });
+
+test('mobile: no sideways scroll, panel opens as a bottom sheet', async () => {
+  const { browser, page } = await loadEditor({ viewport: { width: 390, height: 844 } });
+
+  const overflows = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+  );
+  assert.equal(overflows, false, 'no horizontal overflow at 390px');
+
+  assert.equal(await page.getAttribute('[data-sheet-toggle]', 'aria-expanded'), 'false');
+  await page.click('[data-sheet-toggle]');
+  assert.equal(await page.getAttribute('[data-sheet-toggle]', 'aria-expanded'), 'true');
+  assert.ok(await page.locator('[data-param="species"]').isVisible(), 'form visible when open');
+  await browser.close();
+});

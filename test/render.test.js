@@ -66,3 +66,10 @@ test('catalog lists every tool and the page does not scroll sideways on mobile',
 
   await browser.close();
 });
+
+test('landing page links to the full editor', async () => {
+  const { browser, page } = await load({ width: 1440, height: 900 });
+  const href = await page.getAttribute('a[href="/treegen/"]', 'href');
+  assert.equal(href, '/treegen/');
+  await browser.close();
+});

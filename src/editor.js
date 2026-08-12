@@ -306,6 +306,22 @@ $('[data-mcp-copy]').addEventListener('click', async (event) => {
   setTimeout(() => { button.textContent = 'Copy MCP call'; }, 1600);
 });
 
+/* --- mobile bottom sheet ---------------------------------------------------- */
+const panel = $('[data-panel]');
+const sheetToggle = $('[data-sheet-toggle]');
+const mobile = window.matchMedia('(max-width: 800px)');
+
+function syncSheet() {
+  const open = !mobile.matches || panel.classList.contains('editor__panel--open');
+  sheetToggle.setAttribute('aria-expanded', String(open));
+}
+sheetToggle.addEventListener('click', () => {
+  panel.classList.toggle('editor__panel--open');
+  syncSheet();
+});
+mobile.addEventListener('change', syncSheet);
+syncSheet();
+
 /* --- test/debug hook ------------------------------------------------------- */
 window.__treegenEditor = {
   getState: () => ({ ...state }),

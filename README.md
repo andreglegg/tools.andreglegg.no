@@ -2,6 +2,8 @@
 
 Showcase and playground for my hosted MCP tools. Static site on GitHub Pages.
 
+The full-parameter editor lives at [/treegen/](https://tools.andreglegg.no/treegen/) — every generator param, palette swatches, presets, and all export formats, running client-side.
+
 ## Why the playground runs client-side
 
 The MCP host at `mcp.andreglegg.no` runs on hardware in my flat, so it is not

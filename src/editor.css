@@ -40,3 +40,20 @@
 .swatch[aria-pressed='true'] { border-color: currentColor; outline: 2px solid currentColor; }
 
 .exports__mcp { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+
+@media (max-width: 800px) {
+  .editor { flex-direction: column; }
+  .editor__panel {
+    position: fixed; left: 0; right: 0; bottom: 0; width: auto;
+    max-height: 70dvh; border-left: 0; border-top: 1px solid var(--line, #2a2a2a);
+    background: var(--bg, #111); z-index: 10;
+    transform: translateY(calc(100% - 2.75rem));
+    transition: transform 0.25s ease;
+  }
+  .editor__panel--open { transform: translateY(0); }
+  .editor__sheet-toggle { display: block; width: 100%; padding: 0.6rem; }
+  .edbar__presets { order: 4; flex-basis: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editor__panel { transition: none; }
+}
