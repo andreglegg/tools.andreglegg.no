@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Treegen editor — Andre Glegg</title>
+    <meta name="description" content="Full-parameter editor for treegen. Every species, palette, and export format, running in your browser." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🌳</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="editor-body">
+    <header class="edbar">
+      <a class="edbar__back" href="/">← tools</a>
+      <div class="edbar__presets" data-presets></div>
+      <div class="edbar__seed">
+        <label class="edbar__seedfield">seed
+          <input data-seed type="number" min="1" max="999999" inputmode="numeric" />
+        </label>
+        <button type="button" data-lock aria-pressed="false" title="Keep this seed when loading presets">Lock</button>
+        <button type="button" data-reroll>Reroll</button>
+        <button type="button" data-share>Copy link</button>
+      </div>
+      <div class="edbar__host">
+        <span class="dot" data-status-dot aria-hidden="true"></span>
+        <span data-status-text>checking</span>
+      </div>
+    </header>
+
+    <main class="editor">
+      <div class="editor__viewport">
+        <canvas data-canvas aria-label="Live preview of the generated tree"></canvas>
+        <dl class="hud" data-hud>
+          <div><dt>seed</dt><dd data-hud-seed>—</dd></div>
+          <div><dt>tris</dt><dd data-hud-tris>—</dd></div>
+          <div><dt>meshes</dt><dd data-hud-meshes>—</dd></div>
+          <div><dt>build</dt><dd data-hud-ms>—</dd></div>
+        </dl>
+      </div>
+
+      <aside class="editor__panel" data-panel>
+        <button type="button" class="editor__sheet-toggle" data-sheet-toggle aria-expanded="true">Parameters</button>
+        <form class="editor__form" data-form></form>
+        <div class="editor__exports" data-exports></div>
+      </aside>
+    </main>
+
+    <script type="module" src="/src/editor.js"></script>
+  </body>
+</html>
