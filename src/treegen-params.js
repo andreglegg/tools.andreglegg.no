@@ -2,7 +2,7 @@
 // per generator param: the form, value outputs, URL state, and MCP snippet
 // all render from this table. Seed is deliberately absent — it lives in the
 // top bar, not the panel.
-import { leafPalettes, barkPalettes } from 'treegen/generator';
+import { leafPalettes, barkPalettes, SPECIES_PROFILES } from 'treegen/generator';
 
 export const GROUPS = [
   { id: 'shape', title: 'Shape' },
@@ -12,7 +12,9 @@ export const GROUPS = [
   { id: 'wear', title: 'Age & condition' },
 ];
 
-const SPECIES = ['round', 'oak', 'acacia', 'willow', 'pine', 'birch', 'poplar', 'palm', 'baobab'];
+// Straight from the generator, so a new species appears here the moment
+// treegen ships one — no hand-mirrored list to fall behind.
+const SPECIES = Object.keys(SPECIES_PROFILES);
 const LEAF_STYLES = ['clustered', 'angular', 'rounded', 'flat', 'needles'];
 
 export const PARAMS = [
