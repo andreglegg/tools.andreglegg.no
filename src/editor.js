@@ -1,6 +1,6 @@
 import './styles.css';
 import './editor.css';
-import { presets } from 'treegen/generator';
+import { presets, defaultParams } from 'treegen/generator';
 import { createPlayground } from './playground.js';
 import { checkHealth } from './mcp.js';
 import { GROUPS, PARAMS, coerce } from './treegen-params.js';
@@ -38,10 +38,41 @@ const playground = createPlayground({
   },
 });
 
+/* --- URL state ------------------------------------------------------------- */
+const paramByName = new Map(PARAMS.map((p) => [p.name, p]));
+
+function readUrl() {
+  const q = new URLSearchParams(location.search);
+  const out = {};
+  for (const [key, raw] of q) {
+    const def = paramByName.get(key);
+    if (def) out[key] = coerce(def, raw);
+    else if (key === 'seed') out.seed = Math.min(999_999, Math.max(1, Math.floor(Number(raw) || 1)));
+  }
+  return out;
+}
+
+let urlTimer = 0;
+function syncUrl(s) {
+  clearTimeout(urlTimer);
+  urlTimer = setTimeout(() => {
+    const q = new URLSearchParams();
+    for (const def of PARAMS) {
+      const value = s[def.name];
+      const fallback = def.control === 'toggle' ? false : defaultParams[def.name];
+      if (value !== undefined && value !== fallback) q.set(def.name, String(value));
+    }
+    q.set('seed', String(s.seed));
+    history.replaceState(null, '', `?${q}`);
+  }, 200);
+}
+
 /* --- state ----------------------------------------------------------------- */
 // One state object is the single source of truth; every mutation goes through
 // apply() so the viewport, form, and URL can never disagree.
-let state = { ...presets.oak, seed: randomSeed() };
+const urlState = readUrl();
+let state = { ...presets.oak, ...urlState };
+if (urlState.seed === undefined) state.seed = randomSeed();
 const listeners = [];
 
 function apply(next = {}) {
@@ -59,6 +90,14 @@ function apply(next = {}) {
   for (const fn of listeners) fn(state);
 }
 const onState = (fn) => listeners.push(fn);
+
+onState(syncUrl);
+$('[data-share]').addEventListener('click', async (event) => {
+  const button = event.currentTarget;
+  await navigator.clipboard.writeText(location.href);
+  button.textContent = 'Copied';
+  setTimeout(() => { button.textContent = 'Copy link'; }, 1600);
+});
 
 /* --- seed controls --------------------------------------------------------- */
 const seedInput = $('[data-seed]');

@@ -112,6 +112,28 @@ test('seed lock survives preset loads', async () => {
   await browser.close();
 });
 
+test('URL params drive the initial tree', async () => {
+  const { browser, page } = await loadEditor({ query: '?species=palm&seed=123&brokenTop=true' });
+
+  const state = await page.evaluate(() => window.__treegenEditor.getState());
+  assert.equal(state.species, 'palm');
+  assert.equal(state.seed, 123);
+  assert.equal(state.brokenTop, true);
+  assert.equal(await page.textContent('[data-hud-seed]'), '123');
+  await browser.close();
+});
+
+test('edits serialize into the URL', async () => {
+  const { browser, page } = await loadEditor();
+
+  await page.selectOption('[data-param="species"]', 'baobab');
+  await page.waitForTimeout(500);
+  const search = await page.evaluate(() => location.search);
+  assert.ok(search.includes('species=baobab'), `species in URL, got ${search}`);
+  assert.ok(/seed=\d+/.test(search), 'seed always in URL');
+  await browser.close();
+});
+
 test('dragging the viewport orbits the camera and stops auto-rotate', async () => {
   const { browser, page } = await loadEditor();
 
