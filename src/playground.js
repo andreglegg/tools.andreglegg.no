@@ -2,12 +2,13 @@
 // keeps working when the MCP host is offline — a showcase that goes dark with
 // the home server would be worse than no showcase.
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildTree, meshStats, presets } from 'treegen/generator';
 import { exportGlb } from 'treegen/export';
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export function createPlayground({ canvas, hud, onParams }) {
+export function createPlayground({ canvas, hud, onParams, orbit = false }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -20,6 +21,18 @@ export function createPlayground({ canvas, hud, onParams }) {
   const key = new THREE.DirectionalLight(0xfff2d4, 2.1);
   key.position.set(4, 8, 5);
   scene.add(key);
+
+  let autoRotate = !REDUCED_MOTION;
+  let userMoved = false;
+  let controls = null;
+  if (orbit) {
+    controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.addEventListener('start', () => {
+      autoRotate = false;
+      userMoved = true;
+    });
+  }
 
   let current = null;
   let params = {};
@@ -40,11 +53,14 @@ export function createPlayground({ canvas, hud, onParams }) {
     group.position.y -= center.y;
 
     // Fit by the widest axis and leave headroom, so a hero-detail acacia at
-    // max canopy still sits inside the frame without clipping.
-    const radius = Math.max(size.x, size.y, size.z) * 0.5;
-    const dist = radius / Math.sin((camera.fov * Math.PI) / 360);
-    camera.position.set(0, height * 0.1, dist * 1.42);
-    camera.lookAt(0, 0, 0);
+    // max canopy still sits inside the frame without clipping. Once the user
+    // has taken the camera, stop repositioning it — the tree still recenters.
+    if (!userMoved) {
+      const radius = Math.max(size.x, size.y, size.z) * 0.5;
+      const dist = radius / Math.sin((camera.fov * Math.PI) / 360);
+      camera.position.set(0, height * 0.1, dist * 1.42);
+      camera.lookAt(0, 0, 0);
+    }
   }
 
   function render(next) {
@@ -75,7 +91,8 @@ export function createPlayground({ canvas, hud, onParams }) {
   let raf = 0;
   function loop() {
     raf = requestAnimationFrame(loop);
-    if (!REDUCED_MOTION) pivot.rotation.y += 0.0025;
+    if (autoRotate) pivot.rotation.y += 0.0025;
+    controls?.update();
     renderer.render(scene, camera);
   }
 
@@ -94,9 +111,16 @@ export function createPlayground({ canvas, hud, onParams }) {
     get params() {
       return { ...presets.oak, ...params };
     },
+    get tree() {
+      return current;
+    },
+    get camera() {
+      return camera;
+    },
     dispose() {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', onResize);
+      controls?.dispose();
       renderer.dispose();
     },
   };

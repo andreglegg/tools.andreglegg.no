@@ -29,6 +29,7 @@ const hudFields = {
 
 const playground = createPlayground({
   canvas: $('[data-canvas]'),
+  orbit: true,
   hud: ({ seed, tris, meshes, ms }) => {
     hudFields.seed.textContent = seed;
     hudFields.tris.textContent = tris.toLocaleString('en');
@@ -156,6 +157,14 @@ for (const group of GROUPS) {
 }
 
 /* --- test/debug hook ------------------------------------------------------- */
-window.__treegenEditor = { getState: () => ({ ...state }), apply, PARAMS: PARAMS.map((p) => p.name) };
+window.__treegenEditor = {
+  getState: () => ({ ...state }),
+  apply,
+  PARAMS: PARAMS.map((p) => p.name),
+  cameraPosition: () => {
+    const { x, y, z } = playground.camera.position;
+    return { x, y, z };
+  },
+};
 
 apply();

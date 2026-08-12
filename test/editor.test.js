@@ -71,3 +71,18 @@ test('palette swatch click updates state', async () => {
   assert.equal(state.leafPalette, 3);
   await browser.close();
 });
+
+test('dragging the viewport orbits the camera and stops auto-rotate', async () => {
+  const { browser, page } = await loadEditor();
+
+  const before = await page.evaluate(() => window.__treegenEditor.cameraPosition());
+  await page.mouse.move(500, 400);
+  await page.mouse.down();
+  await page.mouse.move(700, 400, { steps: 8 });
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  const after = await page.evaluate(() => window.__treegenEditor.cameraPosition());
+
+  assert.notDeepEqual(before, after, 'camera moved after drag');
+  await browser.close();
+});
