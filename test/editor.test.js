@@ -36,3 +36,38 @@ test('editor page renders a tree', async () => {
   assert.deepEqual(errors, [], 'no unexpected page errors');
   await browser.close();
 });
+
+test('every registry param renders exactly one control', async () => {
+  const { browser, page } = await loadEditor();
+
+  const names = await page.evaluate(() => window.__treegenEditor.PARAMS);
+  assert.ok(names.length >= 17, `expected full surface, got ${names.length}`);
+  for (const name of names) {
+    assert.equal(
+      await page.locator(`[data-param="${name}"]`).count(), 1,
+      `control for ${name}`
+    );
+  }
+  await browser.close();
+});
+
+test('changing detail via the form rebuilds the mesh', async () => {
+  const { browser, page } = await loadEditor();
+
+  const before = await page.textContent('[data-hud-tris]');
+  await page.selectOption('[data-param="detail"]', '0');
+  await page.waitForTimeout(400);
+  const after = await page.textContent('[data-hud-tris]');
+
+  assert.notEqual(before, after, 'detail 0 changes triangle count');
+  await browser.close();
+});
+
+test('palette swatch click updates state', async () => {
+  const { browser, page } = await loadEditor();
+
+  await page.click('[data-param="leafPalette"] .swatch[data-value="3"]');
+  const state = await page.evaluate(() => window.__treegenEditor.getState());
+  assert.equal(state.leafPalette, 3);
+  await browser.close();
+});
