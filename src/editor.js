@@ -46,6 +46,10 @@ const listeners = [];
 
 function apply(next = {}) {
   state = { ...state, ...next };
+  if (Object.keys(next).some((k) => k !== 'seed')) {
+    activePreset = null;
+    syncChips();
+  }
   try {
     playground.render({ ...state });
   } catch (err) {
@@ -154,6 +158,42 @@ for (const group of GROUPS) {
   section.append(summary);
   for (const def of PARAMS.filter((p) => p.group === group.id)) section.append(buildControl(def));
   form.append(section);
+}
+
+/* --- preset strip ---------------------------------------------------------- */
+const presetMount = $('[data-presets]');
+let activePreset = null;
+
+function applyPreset(name) {
+  activePreset = name;
+  const preset = presets[name];
+  const seed = seedLockedNow() ? state.seed : (preset.seed ?? state.seed);
+  // Presets replace the whole param state, not merge — a preset without
+  // brokenTop must clear a previously set brokenTop.
+  state = { ...preset, seed };
+  try {
+    playground.render({ ...state, brokenTop: Boolean(state.brokenTop) });
+  } catch (err) {
+    hudFields.ms.textContent = err.message;
+  }
+  for (const fn of listeners) fn(state);
+  syncChips();
+}
+
+function syncChips() {
+  for (const chip of presetMount.children) {
+    chip.setAttribute('aria-pressed', String(chip.dataset.preset === activePreset));
+  }
+}
+
+for (const name of Object.keys(presets)) {
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'preset-chip';
+  chip.dataset.preset = name;
+  chip.textContent = name;
+  chip.addEventListener('click', () => applyPreset(name));
+  presetMount.append(chip);
 }
 
 /* --- test/debug hook ------------------------------------------------------- */

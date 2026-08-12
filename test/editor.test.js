@@ -72,6 +72,46 @@ test('palette swatch click updates state', async () => {
   await browser.close();
 });
 
+test('preset chips load full preset params', async () => {
+  const { browser, page } = await loadEditor();
+
+  const chips = await page.locator('.preset-chip').count();
+  assert.ok(chips >= 14, `all treegen presets present, got ${chips}`);
+
+  await page.click('[data-preset="snag"]');
+  await page.waitForTimeout(300);
+  const state = await page.evaluate(() => window.__treegenEditor.getState());
+  assert.equal(state.brokenTop, true, 'snag sets brokenTop');
+  assert.equal(state.leafDensity, 0, 'snag is bare');
+  assert.equal(state.seed, 4788, 'unlocked: preset seed wins');
+
+  // Sync guard: every param a preset carries must have a registry control,
+  // or a new treegen param would silently miss the editor.
+  const missing = await page.evaluate(() => {
+    const names = new Set(window.__treegenEditor.PARAMS);
+    return Object.keys(window.__treegenEditor.getState()).filter(
+      (k) => k !== 'seed' && !names.has(k)
+    );
+  });
+  assert.deepEqual(missing, [], 'every preset param has a registry control');
+  await browser.close();
+});
+
+test('seed lock survives preset loads', async () => {
+  const { browser, page } = await loadEditor();
+
+  await page.fill('[data-seed]', '4242');
+  await page.press('[data-seed]', 'Enter');
+  await page.click('[data-lock]');
+  await page.click('[data-preset="giant"]');
+  await page.waitForTimeout(300);
+
+  const state = await page.evaluate(() => window.__treegenEditor.getState());
+  assert.equal(state.species, 'pine', 'giant preset loaded');
+  assert.equal(state.seed, 4242, 'locked seed kept');
+  await browser.close();
+});
+
 test('dragging the viewport orbits the camera and stops auto-rotate', async () => {
   const { browser, page } = await loadEditor();
 
